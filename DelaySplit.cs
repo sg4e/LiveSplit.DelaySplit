@@ -19,9 +19,11 @@ namespace LiveSplit.DelaySplit
         private TimerModel Model;
         private CancellationTokenSource LastCancellationToken;
         private Form Form;
+        private Settings Settings;
 
         public DelaySplit(LiveSplitState state)
         {
+            Settings = new Settings();
             ContextMenuControls = new Dictionary<string, Action>();
             this.State = state;
             Model = new TimerModel();
@@ -77,7 +79,8 @@ namespace LiveSplit.DelaySplit
 
     public void Dispose()
         {
-
+            LastCancellationToken.Cancel();
+            LastCancellationToken.Dispose();
         }
 
         public void DrawHorizontal(System.Drawing.Graphics g, LiveSplitState state, float height, System.Drawing.Region clipRegion)
@@ -92,17 +95,22 @@ namespace LiveSplit.DelaySplit
 
         public XmlNode GetSettings(XmlDocument document)
         {
-            throw new NotImplementedException();
+            return Settings.GetSettings(document);
         }
 
-        public System.Windows.Forms.Control GetSettingsControl(LayoutMode mode)
+        public Control GetSettingsControl(LayoutMode mode)
         {
-            throw new NotImplementedException();
+            return Settings;
         }
 
         public void SetSettings(XmlNode settings)
         {
-            throw new NotImplementedException();
+            Settings.SetSettings(settings);
+        }
+
+        public int GetSettingsHashCode()
+        {
+            return Settings.GetSettingsHashCode();
         }
 
         public void Update(IInvalidator invalidator, LiveSplitState state, float width, float height, LayoutMode mode)
