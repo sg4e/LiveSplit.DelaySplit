@@ -35,6 +35,11 @@ namespace LiveSplit.DelaySplit
             SmartSplitDelayCheckbox.DataBindings.Add("Checked", this, "EnableSmart");
         }
 
+        public TimeSpan GetDelayAsTimespan()
+        {
+            return SelectedTimeUnit.CreateTimespan(Delay);
+        }
+
         public XmlNode GetSettings(XmlDocument document)
         {
             var parent = document.CreateElement("Settings");

@@ -59,22 +59,71 @@ namespace LiveSplit.DelaySplit
             LastCancellationToken.Dispose();
             LastCancellationToken = new CancellationTokenSource();
             CancellationToken token = LastCancellationToken.Token;
-            String splitName = State.CurrentSplit.Name;
-            Task.Run(async () => {
-                if (splitName.Equals("auto"))
+            string splitName = State.CurrentSplit.Name.ToLowerInvariant();
+            string triggerSplitName = Settings.SplitName.ToLowerInvariant();
+            TimeSpan delay = Settings.GetDelayAsTimespan();
+            bool smartSplit = Settings.EnableSmart;
+            bool scheduleSplit = false;
+            if(smartSplit)
+            {
+                TimeSpan? ts = ParseSmartSplit(splitName);
+                if(ts != null)
                 {
-                    await Task.Delay(5000, token);
+                    delay = (TimeSpan) ts;
+                    scheduleSplit = true;
+                }
+            }
+            if(splitName.Equals(triggerSplitName))
+            {
+                scheduleSplit = true;
+            }
+            if (scheduleSplit)
+            {
+                Task.Run(async () =>
+                {
+                    await Task.Delay(delay, token);
                     if (!token.IsCancellationRequested)
                     {
                         Form.BeginInvoke(new Action(() => OnSplitImpl()));
                     }
-                }
-            });
+                });
+            }
         }
 
         private void OnSplitImpl()
         {
             Model.Split();
+        }
+
+        private TimeSpan? ParseSmartSplit(string splitName)
+        {
+            splitName = splitName.Trim();
+            string[] words = splitName.Split(' ');
+            if(words.Length != 2)
+                return null;
+            double quantity;
+            try
+            {
+                quantity = Convert.ToDouble(words[0]);
+            }
+            catch
+            {
+                return null;
+            }
+            string unitString = words[1];
+            // change any singular forms to plural before comparison
+            if(!unitString.EndsWith("s"))
+            {
+                unitString += "s";
+            }
+            foreach(TimeUnit unit in TimeUnit.enumerate())
+            {
+                if(unit.Name.Equals(unitString))
+                {
+                    return unit.CreateTimespan(quantity);
+                }
+            }
+            return null;
         }
 
     public void Dispose()

@@ -18,7 +18,7 @@ namespace LiveSplit.DelaySplit
         public static readonly TimeUnit Minutes = new TimeUnit(StringMinutes, TimeSpan.FromMinutes);
         public static readonly TimeUnit Hours = new TimeUnit(StringHours, TimeSpan.FromHours);
 
-        private string Name;
+        public string Name { get; private set; }
         private Func<double, TimeSpan> TimespanMethod;
 
         private TimeUnit(string name, Func<double, TimeSpan> timespanMethod)
