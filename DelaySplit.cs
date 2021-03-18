@@ -31,6 +31,12 @@ namespace LiveSplit.DelaySplit
             Form = state.Form;
             LastCancellationToken = new CancellationTokenSource();
             state.OnSplit += OnSplit;
+            state.OnReset += OnReset;
+            state.OnPause += OnPause;
+            state.OnResume += OnSplit;
+            state.OnSkipSplit += OnSplit;
+            state.OnUndoSplit += OnSplit;
+            state.OnStart += OnSplit;
         }
 
         public string ComponentName => "DelaySplit";
@@ -55,8 +61,7 @@ namespace LiveSplit.DelaySplit
 
         private void OnSplit(object sender, EventArgs e)
         {
-            LastCancellationToken.Cancel();
-            LastCancellationToken.Dispose();
+            CancelAndDisposeLastToken();
             LastCancellationToken = new CancellationTokenSource();
             CancellationToken token = LastCancellationToken.Token;
             string splitName = State.CurrentSplit.Name.ToLowerInvariant();
@@ -93,6 +98,23 @@ namespace LiveSplit.DelaySplit
         private void OnSplitImpl()
         {
             Model.Split();
+        }
+
+        private void OnReset(object sender, TimerPhase e) => CancelAndDisposeLastToken();
+
+        private void OnPause(object sender, EventArgs e) => CancelAndDisposeLastToken();
+
+        private void CancelAndDisposeLastToken()
+        {
+            try
+            {
+                LastCancellationToken.Cancel();
+                LastCancellationToken.Dispose();
+            }
+            catch(ObjectDisposedException)
+            {
+
+            }
         }
 
         private TimeSpan? ParseSmartSplit(string splitName)
