@@ -11,6 +11,7 @@ Download the latest DLL file from the [Releases page](https://github.com/sg4e/Li
 Open LiveSplit and right-click on your splits -> "Edit Layout..." -> click the "+" icon -> "Control" -> "DelaySplit".
 
 Click the "Layout Settings" button to adjust DelaySplit's default settings. Please note that these settings are saved to your LiveSplit layout file and not your splits file.
+
 ![DelaySplit default settings](/DelaySplit_settings.png)
 
 ## Precision
